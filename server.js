@@ -1,0 +1,62 @@
+const express = require("express");
+const path = require("path");
+const db = require("./data/database");
+
+const app = express();
+const PORT = 5756;
+
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "front")));
+
+app.post("/add", (req, res) => {
+    console.log(req.body);
+
+    const { name, price, count, category } = req.body;
+
+    const result = db.prepare(`
+        INSERT INTO items (name, price, count, category)
+        VALUES (?, ?, ?, ?)
+    `).run(name, price, count, category);
+
+    res.json({ success: result.changes > 0 , id: result.lastInsertRowid});
+});
+
+app.get("/items", (req, res) => {
+    const items = db.prepare(`
+        SELECT * FROM items
+    `).all();
+
+    res.json(items);
+});
+
+app.get("/del/:id", (req, res) => {
+    const id = req.params.id;
+
+    const result = db.prepare(`
+        DELETE FROM items WHERE id = ?
+    `).run(id);
+
+    res.json({
+        success: result.changes > 0
+    });
+});
+
+app.put("/items/:id", (req, res) => {
+    const id = req.params.id;
+    const { name, price, count, category } = req.body;
+
+    const result = db.prepare(`
+        UPDATE items
+        SET name = ?, price = ?, count = ?, category = ?
+        WHERE id = ?
+    `).run(name, price, count, category, id);
+
+    res.json({
+        success: result.changes > 0
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
