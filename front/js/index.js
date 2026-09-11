@@ -34,15 +34,22 @@ document.querySelector(".close-btn").addEventListener("click", () => {
 });
 
 search.addEventListener("input", (e) => {
-    const query = search.value.trim();
+    const query = search.value.trim().toLowerCase();
+
+    const words = query.split(/\s+/);
 
     const results = items.filter(item => {
-        return (
-            item.name.includes(query) ||
-            String(item.id).includes(query) ||
-            item.category.includes(query)
+        const name = String(item.name).toLowerCase();
+        const category = String(item.category).toLowerCase();
+        const id = String(item.id);
+
+        return words.every(word =>
+            id.includes(word) ||
+            name.includes(word) ||
+            category.includes(word)
         );
     });
+
     refreshItems(results);
 });
 
@@ -81,15 +88,14 @@ function add() {
 }
 
 async function addItem(data) {
-    if (items.filter(x => x.name.includes(data.get('name'))).length != 0) {
-
-        alert('name should be unic!');
+    if (items.some(x => x.name.trim() === data.get('name').trim())) {
+        alert('name should be unique!');
         return;
-    };
+    }
     console.log(items);
     console.log(data);
     console.log(items.filter(x => x.name.includes(data.get('name'))));
-    const response = await fetch("http://localhost:5756/add", {
+    const response = await fetch("/add", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -107,7 +113,7 @@ async function addItem(data) {
 }
 
 async function getItem() {
-    const response = await fetch("http://localhost:5756/items");
+    const response = await fetch("/items");
     const result = await response.json();
     items = result;
     drawItems(result);
@@ -143,6 +149,10 @@ function drawItems(result) {
 }
 
 function edit(id) {
+    if (items.some(x => x.name.trim() === data.get('name').trim())) {
+        alert('name should be unique!');
+        return;
+    }
     activate(id);
     toggle(itemadd);
     itemadd.innerHTML = `            <form class="addform">
@@ -160,7 +170,7 @@ function edit(id) {
                         <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#fffffff"
                             d="M17 15V18M17 21V18M17 18H14M17 18H20"></path>
                     </svg>
-                    ADD ITEM
+                    EDIT ITEM
                 </button>
 
             </form>`;
@@ -200,7 +210,7 @@ function edit(id) {
 }
 
 async function requestEdit(id, data) {
-    const response = await fetch(`http://localhost:5756/items/${id}`, {
+    const response = await fetch(`/items/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -234,7 +244,7 @@ function activate(id) {
     review.innerHTML = "";
     for (let i = 0; i < selectedItems.length; i++) {
         const ida = selectedItems[i];
-        const element = items.filter(x=>String(x.id).includes(ida))[0];
+        const element = items.filter(x => String(x.id).includes(ida))[0];
         review.innerHTML += `<div class="itemm">
                     <span class="data count" id = '${id}c'>1*</span>
                     <button class="state red">[-]</button>

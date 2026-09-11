@@ -19,7 +19,7 @@ app.post("/add", (req, res) => {
         VALUES (?, ?, ?, ?)
     `).run(name, price, count, category);
 
-    res.json({ success: result.changes > 0 , id: result.lastInsertRowid});
+    res.json({ success: result.changes > 0, id: result.lastInsertRowid });
 });
 
 app.get("/items", (req, res) => {
@@ -57,6 +57,6 @@ app.put("/items/:id", (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
