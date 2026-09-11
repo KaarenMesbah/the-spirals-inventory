@@ -88,10 +88,10 @@ function add() {
 }
 
 async function addItem(data) {
-    if (items.some(x => x.name.trim() === data.get('name').trim())) {
-        alert('name should be unique!');
-        return;
-    }
+    // if (items.some(x => x.name.trim() === data.get('name').trim())) {
+    //     alert('name should be unique!');
+    //     return;
+    // }
     console.log(items);
     console.log(data);
     console.log(items.filter(x => x.name.includes(data.get('name'))));
@@ -149,10 +149,6 @@ function drawItems(result) {
 }
 
 function edit(id) {
-    if (items.some(x => x.name.trim() === data.get('name').trim())) {
-        alert('name should be unique!');
-        return;
-    }
     activate(id);
     toggle(itemadd);
     itemadd.innerHTML = `            <form class="addform">
