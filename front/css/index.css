@@ -203,7 +203,7 @@ main {
   color: #000000;
   outline: none;
   width: 200px;
-  height: 20px;
+  height: 50px !important;
 }
 
 .input-style:focus {

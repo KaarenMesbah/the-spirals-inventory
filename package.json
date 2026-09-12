@@ -12,9 +12,12 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "arabic-persian-reshaper": "^1.0.1",
     "better-sqlite3": "^13.0.3",
+    "bidi-js": "^1.1.0",
     "express": "^5.2.1",
     "multer": "^2.3.0",
+    "pdfkit": "^0.20.2",
     "sqlite": "^5.1.1"
   }
 }

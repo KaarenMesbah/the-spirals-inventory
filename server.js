@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const db = require("./data/database");
+const generateItemsPdf = require('./data/itemsPdf');
 
 const app = express();
 const PORT = 5756;
@@ -20,6 +21,31 @@ app.post("/add", (req, res) => {
     `).run(name, price, count, category);
 
     res.json({ success: result.changes > 0, id: result.lastInsertRowid });
+});
+
+app.get('/items/pdf', (req, res) => {
+    try {
+        const items = db.prepare(`
+            SELECT id, name, price, count, category
+            FROM items
+            ORDER BY id
+        `).all();
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader(
+            'Content-Disposition',
+            'attachment; filename="items.pdf"'
+        );
+
+        generateItemsPdf(items, res);
+
+    } catch (error) {
+        console.error(error);
+
+        if (!res.headersSent) {
+            res.status(500).send('Failed to generate PDF');
+        }
+    }
 });
 
 app.get("/items", (req, res) => {
