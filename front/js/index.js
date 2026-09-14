@@ -92,9 +92,6 @@ async function addItem(data) {
     //     alert('name should be unique!');
     //     return;
     // }
-    console.log(items);
-    console.log(data);
-    console.log(items.filter(x => x.name.includes(data.get('name'))));
     const response = await fetch("/add", {
         method: "POST",
         headers: {
@@ -223,13 +220,16 @@ async function requestEdit(id, data) {
     console.log(result);
 }
 const review = document.getElementsByClassName("review")[0];
+review.innerHTML = "";
+let uiCount = [];
+
+let sum = 0;
 
 function activate(id) {
     const element = document.getElementById(id);
     id = Number(id);
     const index = selectedItems.indexOf(id);
 
-    console.log(index);
     if (index != -1) {
         element.classList.remove("active");
         selectedItems.splice(index, 1);
@@ -238,18 +238,151 @@ function activate(id) {
         selectedItems.push(id);
     }
     review.innerHTML = "";
+    sum = 0;
     for (let i = 0; i < selectedItems.length; i++) {
+
         const ida = selectedItems[i];
         const element = items.filter(x => String(x.id).includes(ida))[0];
+
+        if (uiCount.find(x => x.id == element.id) == undefined) {
+            uiCount.push({ id: element.id, count: 1, max: element.count, price: element.price });
+        }
+
+        const data = uiCount.find(x => x.id == element.id);
+        sum += data.price * data.count;
+
         review.innerHTML += `<div class="itemm">
-                    <span class="data count" id = '${id}c'>1*</span>
-                    <button class="state red">[-]</button>
-                    <span class="data">${element.name}</span>
-                    <button class="state">[+]</button>
+                    <span class="data count" id = '${element.id}c'>${data.count}*</span>
+                    <button class="state red" onclick ='count(${element.id},false)'>[-]</button>
+                    <span class="data name">${element.name}</span>
+                    <button class="state"onclick = 'count(${element.id},true)'>[+]</button>
                     <span class="max data">max ${element.count}</span>
                     <div>
-                        <span class="data price">${element.price.toLocaleString()}$ * 1 = ${element.price.toLocaleString()}$</span>
+                        <span onclick = "changeVal(${element.id})" class="data price" id = "${element.id}b">${data.price.toLocaleString()}$ * ${data.count} = ${(data.price * data.count).toLocaleString()}$</span>
                     </div>
                 </div>`
     }
+    if (review.innerHTML != "") {
+        document.getElementsByClassName('bottom')[0].innerHTML = `
+                <span class="data sum">sum : ${sum.toLocaleString()}</span>
+                <button class="confirm" onclick = "purchase()">confirm</button>`
+    }
+    else {
+        document.getElementsByClassName('bottom')[0].innerHTML = "";
+        uiCount = [];
+    }
+}
+
+
+function count(id, bool) {
+    const num = document.getElementById(id + "c");
+    const all = document.getElementById(id + "b");
+    const data = uiCount.find(x => x.id == id);
+
+    if (bool && data.max > data.count) {
+        data.count++;
+        sum += data.price;
+    }
+    else if (!bool && data.count > 1) {
+        data.count--;
+        sum -= data.price;
+    }
+    num.innerHTML = `${data.count}*`;
+    all.innerHTML = `${data.price.toLocaleString()}$ * ${data.count} = ${(data.price * data.count).toLocaleString()}$`;
+    document.getElementsByClassName('bottom')[0].innerHTML = `
+                <span class="data sum">sum : ${sum.toLocaleString()}</span>
+                <button class="confirm" onclick = "purchase()">confirm</button>`
+}
+
+function changeVal(id) {
+    const price = document.getElementById(id + "b");
+    const data = uiCount.find(x => x.id == id);
+
+    price.innerHTML = `
+    <input
+        type="number"
+        value="${data.price}"
+        id="${id}price"
+        onblur="saveVal(${id})"
+        onkeydown="if(event.key === 'Enter') saveVal(${id})"
+    >
+`;
+
+    document.getElementById(id + "price").focus();
+}
+
+function saveVal(id) {
+    const input = document.getElementById(id + "price");
+    const data = uiCount.find(x => x.id == id);
+
+    data.price = Number(input.value);
+
+    sum = 0;
+    uiCount.forEach(x => {
+        sum += x.price * x.count;
+    });
+
+    const price = document.getElementById(id + "b");
+
+    price.innerHTML =
+        `${data.price.toLocaleString()}$ * ${data.count} = ${(data.price * data.count).toLocaleString()}$`;
+
+    document.getElementsByClassName('bottom')[0].innerHTML = `
+        <span class="data sum">sum : ${sum.toLocaleString()}</span>
+        <button class="confirm" onclick = "purchase()">confirm</button>
+    `;
+}
+
+async function purchase() {
+    const now = new Date();
+
+    const date = now.toLocaleDateString();
+    const time = now.toLocaleTimeString();
+
+    const purchase = {
+        date: `${date + "   " + time}`,
+        items: []
+    };
+
+    for (let i = 0; i < selectedItems.length; i++) {
+
+        const ida = selectedItems[i];
+        const element = items.find(x => x.id == ida);
+        const data = uiCount.find(x => x.id == element.id);
+
+        purchase.items.push(
+            {
+                name: element.name,
+                item_id: element.id,
+                price: data.price,
+                original_price: element.price,
+                count: data.count,
+                category: element.category
+            }
+        );
+    }
+    const res = await fetch('/purchases', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(purchase)
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+
+    sum = 0;
+    uiCount = [];
+
+    selectedItems.forEach(id => {
+        document.getElementById(id)?.classList.remove("active");
+    });
+
+    selectedItems = [];
+
+    review.innerHTML = "";
+    document.getElementsByClassName('bottom')[0].innerHTML = "";
+    open(`/purchases/${data.purchase_id}`)
 }

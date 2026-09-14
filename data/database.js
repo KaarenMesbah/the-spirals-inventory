@@ -15,18 +15,25 @@ db.prepare(`
 db.prepare(`
     CREATE TABLE IF NOT EXISTS purchase (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
+        total INTEGER
     )
 `).run();
 
 db.prepare(`
-    CREATE TABLE IF NOT EXISTS bob (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        item_id TEXT NOT NULL,
-        price INTEGER,
-        purchase_id INTEGER,
-        category TEXT
-    )
+CREATE TABLE IF NOT EXISTS bob (
+    name TEXT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id INTEGER NOT NULL,
+    price INTEGER NOT NULL,
+    original_price INTEGER NOT NULL,
+    count INTEGER NOT NULL,
+    purchase_id INTEGER NOT NULL,
+    category TEXT,
+
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (purchase_id) REFERENCES purchase(id)
+)
 `).run();
 
 module.exports = db;
