@@ -384,5 +384,5 @@ async function purchase() {
 
     review.innerHTML = "";
     document.getElementsByClassName('bottom')[0].innerHTML = "";
-    open(`/purchases/${data.purchase_id}`)
+    window.open(`/purchases/${data.purchase_id}/pdf`, '_blank');
 }

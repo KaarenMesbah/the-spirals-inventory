@@ -4,7 +4,6 @@ const path = require("path");
 const normalFont = path.join(__dirname, "../font/tahoma.ttf");
 const boldFont = path.join(__dirname, "../font/tahoma.ttf");
 
-
 function rtl(text) {
     if (text === null || text === undefined) {
         return '';
@@ -15,8 +14,7 @@ function rtl(text) {
         .join('\u00A0');
 }
 
-function generateItemsPdf(items, res) {
-
+function generatePurchasesPdf(purchase, items, res) {
     const doc = new PDFDocument({
         margin: 40,
         size: 'A4'
@@ -31,23 +29,31 @@ function generateItemsPdf(items, res) {
     doc
         .font(boldFont)
         .fontSize(20)
-        .text(rtl('لیست کالاها'), {
+        .text(rtl('فاکتور خرید'), {
             align: 'center'
         });
 
     doc.moveDown();
 
     // =========================
-    // Date
+    // Purchase info
     // =========================
 
     doc
         .font(normalFont)
         .fontSize(10)
         .text(
-            rtl(`تاریخ: ${new Date().toLocaleString('fa-IR')}`),
+            rtl(`شماره خرید: ${purchase.id}`),
             {
-                align: 'center'
+                align: 'right'
+            }
+        );
+
+    doc
+        .text(
+            `${purchase.date}`,
+            {
+                align: 'right'
             }
         );
 
@@ -69,22 +75,27 @@ function generateItemsPdf(items, res) {
         {
             title: 'نام کالا',
             x: startX + 45,
-            width: 180
+            width: 150
         },
         {
             title: 'قیمت',
-            x: startX + 225,
+            x: startX + 195,
+            width: 90
+        },
+        {
+            title: 'قیمت اصلی',
+            x: startX + 285,
             width: 90
         },
         {
             title: 'تعداد',
-            x: startX + 315,
-            width: 70
+            x: startX + 375,
+            width: 60
         },
         {
             title: 'دسته‌بندی',
-            x: startX + 385,
-            width: 130
+            x: startX + 435,
+            width: 70
         }
     ];
 
@@ -94,7 +105,7 @@ function generateItemsPdf(items, res) {
 
     doc
         .font(boldFont)
-        .fontSize(10);
+        .fontSize(9);
 
     columns.forEach(column => {
         doc.text(
@@ -127,12 +138,11 @@ function generateItemsPdf(items, res) {
 
         if (y > 750) {
             doc.addPage();
-
             y = 40;
 
             doc
                 .font(boldFont)
-                .fontSize(10);
+                .fontSize(9);
 
             columns.forEach(column => {
                 doc.text(
@@ -160,7 +170,7 @@ function generateItemsPdf(items, res) {
 
         // ID
         doc.text(
-            String(item.id ?? ''),
+            String(item.item_id ?? ''),
             columns[0].x,
             y,
             {
@@ -171,7 +181,7 @@ function generateItemsPdf(items, res) {
 
         // Name
         doc.text(
-            rtl(item.name),
+            rtl(item.name ?? ''),
             columns[1].x,
             y,
             {
@@ -191,9 +201,9 @@ function generateItemsPdf(items, res) {
             }
         );
 
-        // Count
+        // Original price
         doc.text(
-            String(item.count ?? ''),
+            Number(item.original_price ?? 0).toLocaleString('en-US'),
             columns[3].x,
             y,
             {
@@ -202,9 +212,9 @@ function generateItemsPdf(items, res) {
             }
         );
 
-        // Category
+        // Count
         doc.text(
-            rtl(item.category),
+            String(item.count ?? ''),
             columns[4].x,
             y,
             {
@@ -213,11 +223,22 @@ function generateItemsPdf(items, res) {
             }
         );
 
+        // Category
+        doc.text(
+            rtl(item.category ?? ''),
+            columns[5].x,
+            y,
+            {
+                width: columns[5].width,
+                align: 'right'
+            }
+        );
+
         y += 20;
     }
 
     // =========================
-    // Summary
+    // Total
     // =========================
 
     y += 15;
@@ -229,20 +250,15 @@ function generateItemsPdf(items, res) {
 
     y += 15;
 
-    doc
-        .font(boldFont)
-        .fontSize(10)
-        .text(
-            rtl(`تعداد کل کالاها: ${items.length}`),
-            startX,
-            y,
-            {
-                align: 'right',
-                width: 505
-            }
-        );
+const total = Number(purchase.total ?? 0).toLocaleString('en-US');
+
+doc.font(boldFont)
+    .fontSize(11)
+    .text(`${total} : ${rtl('مبلغ کل')}`, startX, y, {
+        align: 'right',
+        width: 505
+    });
 
     doc.end();
 }
-
-module.exports = generateItemsPdf;
+module.exports = generatePurchasesPdf;

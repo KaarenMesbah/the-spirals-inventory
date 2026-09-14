@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const db = require("./data/database");
 const generateItemsPdf = require('./data/itemsPdf');
+const generatePurchasesPdf = require('./data/purchasePdf');
 
 const app = express();
 const PORT = 5756;
@@ -240,7 +241,42 @@ app.post('/purchases', (req, res) => {
         });
     }
 });
+app.get('/purchases/:id/pdf', (req, res) => {
+    const purchaseId = req.params.id;
 
+    const purchase = db.prepare(`
+        SELECT id, date, total
+        FROM purchase
+        WHERE id = ?
+    `).get(purchaseId);
+
+    if (!purchase) {
+        return res.status(404).json({
+            error: 'Purchase not found'
+        });
+    }
+
+    const items = db.prepare(`
+        SELECT
+            item_id,
+            name,
+            price,
+            original_price,
+            count,
+            category
+        FROM bob
+        WHERE purchase_id = ?
+        ORDER BY id
+    `).all(purchaseId);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+        'Content-Disposition',
+        `inline; filename="purchase-${purchaseId}.pdf"`
+    );
+
+    generatePurchasesPdf(purchase, items, res);
+});
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
