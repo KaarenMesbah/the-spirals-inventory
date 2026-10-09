@@ -1,48 +1,61 @@
-# Inventory & Sales Management System
+# The Spiral App: Inventory & Sales Management System
 
-A lightweight inventory and sales management application built with **Node.js, Express, and SQLite**. It provides a simple way to manage products, track purchases, monitor price changes, and generate PDF reports.
+An inventory and sales management app built for **Spiral**, a startup of young creators selling handmade products. The team used it **live at their events** to track stock, record sales, and print receipts.
+
+Built from scratch with **Node.js, Express, and SQLite**, with a Persian-language interface.
+
+![Main screen](screenshots/main-screen.png)
 
 ## Features
 
-### Inventory Management
+- **Stock tracking**: add, edit, and manage products with names, categories, prices, and quantities.
+- **Live search**: search-as-you-type with suggestions that narrow as you type, matching item name and category at the same time.
+- **Fast sales flow**: find items by searching or browsing, select them (highlighted in blue) to build a purchase list, set the quantity for each item, and adjust prices live to apply discounts.
+- **PDF receipts**: confirming a sale generates a receipt showing the original price, the adjusted price, and the purchase details.
+- **PDF inventory report**: export the full list of items in stock as a PDF.
+- **Purchase records**: view and manage past purchases, with totals calculated automatically and large numbers formatted with thousands separators.
+- **Zero-setup database**: SQLite stores everything locally, so no separate database server is needed.
 
-* Add, view, and manage products.
-* Store product names, prices, quantities, and categories.
-* Search and filter inventory items.
+## Screenshots
 
-### Purchase Management
+| Main screen | Search |
+| --- | --- |
+| ![Main screen](screenshots/main-screen.png) | ![Live search](screenshots/search.png) |
+| Add, edit, and search items. Select items to build a purchase list, set quantities, and adjust prices live for discounts. | Suggestions narrow down as you type, across names and categories. |
 
-* Create purchases containing multiple products.
-* Set individual prices and quantities for each purchased item.
-* Track original prices and changes in purchase prices.
-* Calculate purchase totals automatically.
-* View and manage purchase records.
+| PDF receipt | PDF inventory report |
+| --- | --- |
+| ![PDF receipt](screenshots/receipt.png) | ![PDF inventory report](screenshots/inventory-report.png) |
+| Generated on confirmation, showing the original and adjusted prices along with the purchase details. | The full list of items in stock, exported as a PDF. |
 
-### PDF Reports
+## Tech Stack
 
-* Export inventory lists as PDF documents.
-* Generate PDF reports for purchases.
-* Display product information, quantities, prices, and totals.
-* Format large numbers with thousands separators.
+| Technology | Purpose |
+| --- | --- |
+| **Node.js** | Backend runtime |
+| **Express.js** | HTTP server and REST API |
+| **SQLite** with **better-sqlite3** | Database |
+| **PDFKit** | PDF generation |
+| **HTML / CSS / JavaScript** | Frontend (no framework) |
 
-### Lightweight Database
+## Getting Started
 
-* SQLite database for persistent data storage.
-* No separate database server required.
+**Requirements:** [Node.js](https://nodejs.org/) installed.
 
-### Simple Web Interface
+```bash
+git clone https://github.com/KaarenMesbah/the-spirals-inventory.git
+cd  the-spirals-inventory
+npm install
+node server.js
+```
 
-* Browser-based interface.
-* Lightweight frontend using HTML, CSS, and JavaScript.
-* Express-powered REST API.
+Then open `http://localhost:5756` in your browser.
 
-## Technologies
+## About the Project
 
-| Technology                  | Purpose                  |
-| --------------------------- | ------------------------ |
-| **Node.js**                 | Backend runtime          |
-| **Express.js**              | HTTP server and REST API |
-| **SQLite**                  | Database                 |
-| **better-sqlite3**          | SQLite integration       |
-| **PDFKit**                  | PDF generation           |
-| **HTML / CSS / JavaScript** | Frontend                 |
+I built this independently for Spiral, from the database and REST API to the interface and PDF generation. It was used in real conditions at their events, which shaped the design: a fast search, a quick sales flow, and receipts that clearly show discounts.
+
+## Author
+
+Full-stack developer
+GitHub: [KaarenMesbah](https://github.com/KaarenMesbah)
