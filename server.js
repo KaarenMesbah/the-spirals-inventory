@@ -35,7 +35,7 @@ app.get('/items/pdf', (req, res) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader(
             'Content-Disposition',
-            'attachment; filename="items.pdf"'
+            'inline; filename="items.pdf"'
         );
 
         generateItemsPdf(items, res);
