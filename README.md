@@ -25,7 +25,7 @@ Built from scratch with **Node.js, Express, and SQLite**, with a Persian-languag
 
 | PDF receipt | PDF inventory report |
 | --- | --- |
-| ![PDF receipt](screenshots/receipt.png) | ![PDF inventory report](screenshots/inventory-report.png) |
+| ![PDF receipt](screenshots/pdf-r.png) | ![PDF inventory report](screenshots/pdf-list.png) |
 | Generated on confirmation, showing the original and adjusted prices along with the purchase details. | The full list of items in stock, exported as a PDF. |
 
 ## Tech Stack
